@@ -1,26 +1,33 @@
-import React from "react";
+import React from 'react';
+import './styles.css'; 
 
 const AboutUs = () => {
   return (
-    <div className="about-us-container">
-      <div className="container mt-5 pt-5">
-        <h1 className="text-center mb-4">About Us</h1>
+    <div style={{ fontFamily: 'Arial, sans-serif' }}>
+     
+      <div style={{ position: 'relative', width: '100%', marginBottom: '20px' }}>
         
-        <div className="row">
-          <div className="col-md-6">
-            <h3>Who We Are</h3>
-            <p>
-              We are a passionate travel company that aims to create unforgettable experiences for our customers. 
-              With a team of experienced travel enthusiasts, we design tailored travel packages to explore the world’s most exciting destinations.
-            </p>
-          </div>
+        <img 
+          src="/assets/images/siwa.jpg" 
+          alt="About Us" 
+          style={{ width: '100%', height: 'auto' }} 
+        />
 
-         
+        <div 
+          style={{ 
+            position: 'absolute', 
+            top: '50%', 
+            left: '50%', 
+            transform: 'translate(-50%, -50%)', 
+            textAlign: 'center',
+            color: 'white', 
+            fontFamily: 'Yesteryear, cursive', 
+            fontSize: '7rem', 
+            textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)', 
+          }}
+        >
+          About Us
         </div>
-
-        
-
-        
       </div>
     </div>
   );

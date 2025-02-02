@@ -10,7 +10,7 @@ const HomePage = () => {
     slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 3000,
+    autoplaySpeed: 1500,
   };
 
   return (
@@ -26,7 +26,7 @@ const HomePage = () => {
         </div>
         <div>
           <img
-            src="/assets/images/tomb-4300251_640.jpg"
+            src="/assets/images/snorkling.jpg"
             alt="Tomb Landscape"
           />
         </div>
