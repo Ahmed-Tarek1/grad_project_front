@@ -5,17 +5,21 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Services from './pages/Services';
 import TravelWithUs from './pages/TravelWithUs';
+import Travels from './pages/Travels';
+import Companies from './pages/Companies';
 
 function App() {
   return (
     <Router>
-      <div className="relative min-h-screen">
+      <div className="min-h-screen flex flex-col">
         <Navbar />
-        <main className="pb-[400px]">
+        <main className="flex-grow pt-16">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/services" element={<Services />} />
             <Route path="/travel-with-us" element={<TravelWithUs />} />
+            <Route path="/travels" element={<Travels />} />
+            <Route path="/companies" element={<Companies />} />
           </Routes>
         </main>
         <Footer />
@@ -24,4 +28,4 @@ function App() {
   );
 }
 
-export default App;
+export default App
