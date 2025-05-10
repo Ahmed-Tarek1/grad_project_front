@@ -32,7 +32,7 @@ const events = [
     location: "Luxor",
     duration: "5 hours",
     groupSize: "6-10",
-    image: "https://images.unsplash.com/photo-1590708669751-3b240de0c317?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+    image: "https://demo-source.imgix.net/mountains.jpg",
     price: 95
   }
 ];

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Star, X, MapPin, Clock, Users, CalendarDays, Utensils, Wifi, Bus } from 'lucide-react';
+import { Star, X, MapPin, Clock, Users, CalendarDays, Utensils, Wifi, Bus, Heart } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import { useFavorites } from '../context/FavoritesContext';
 
 const travels = [
   {
@@ -333,6 +334,7 @@ const Travels = () => {
   const [selectedTrip, setSelectedTrip] = useState<any>(null);
   const [company, setCompany] = useState<string | null>(null);
   const location = useLocation();
+  const { toggleFavorite, isFavorite } = useFavorites();
 
   useEffect(() => {
     // Retrieve company from local storage or URL parameters
@@ -515,6 +517,19 @@ const Travels = () => {
                           <span className="ml-2 text-gray-600">• {trip.reviews}</span>
                         </div>
                       </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent card click
+                          toggleFavorite(trip);
+                        }}
+                        className="p-2 rounded-full hover:bg-gray-100"
+                        aria-label="Add to favorites"
+                      >
+                        <Heart
+                          size={20}
+                          className={isFavorite(trip.id) ? "text-red-500 fill-current" : "text-gray-400"}
+                        />
+                      </button>
                     </div>
                     
                     <div className="mb-4">

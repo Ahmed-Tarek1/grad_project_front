@@ -7,10 +7,12 @@ import RomanticDestination from '../components/RomanticDestination';
 import PopularDestinations from '../components/PopularDestinations';
 import TrendingTours from '../components/TrendingTours';
 import Testimonials from '../components/Testimonials';
+import { useTranslation } from 'react-i18next';
 
 const Home = () => {
+  const { t } = useTranslation();
   return (
-    <>
+    <div className="relative">
       <Hero />
       <Partners />
       <ServicesSection />
@@ -19,7 +21,7 @@ const Home = () => {
       <PopularDestinations />
       <TrendingTours />
       <Testimonials />
-    </>
+    </div>
   );
 };
 

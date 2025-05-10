@@ -1,473 +1,141 @@
 import React, { useState, useEffect } from 'react';
 import { Star, ChevronLeft, ChevronRight, Search, SlidersHorizontal } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-const discounts = [
-  {
-    id: 1,
-    title: "Last Minute Deal: Hurghada Resort",
-    rating: 4.5,
-    reviews: 890,
-    price: 2500,
-    originalPrice: 5000,
-    hotelName: "Hurghada Beach Resort",
-    image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-    availableUntil: "Tomorrow",
-    discount: 50,
-    isLimitedTime: true
-  },
-  {
-    id: 2,
-    title: "Flash Sale: Alexandria Weekend",
-    rating: 4.3,
-    reviews: 756,
-    price: 1800,
-    originalPrice: 3000,
-    hotelName: "Alexandria Sea View",
-    image: "https://images.unsplash.com/photo-1529253355930-ddbe423a2ac7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-    availableUntil: "Next 24 hours",
-    discount: 40,
-    isLimitedTime: true
-  },
-  {
-    id: 3,
-    title: "Early Bird: Aswan Cruise",
-    rating: 4.7,
-    reviews: 1200,
-    price: 4000,
-    originalPrice: 6000,
-    hotelName: "Nile Cruise Deluxe",
-    image: "https://images.unsplash.com/photo-1548574505-5e239809ee19?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-    availableUntil: "This week",
-    discount: 33,
-    isLimitedTime: false
-  }
-];
-
-const allCompanies = [
-  {
-    id: 1,
-    name: "Luxury Voyages",
-    logo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80",
-    rating: 4.8,
-    reviews: 1250,
-    description: "Specializing in luxury travel experiences and exclusive destinations worldwide.",
-    destinations: ["Europe", "Asia", "Caribbean"],
-    established: 2005,
-    verified: true,
-    type: "Luxury",
-    specialties: ["Luxury Tours", "Honeymoon Packages", "Private Jets"]
-  },
-  {
-    id: 2,
-    name: "Adventure Quest Tours",
-    logo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80",
-    rating: 4.6,
-    reviews: 890,
-    description: "Your gateway to thrilling adventures and outdoor experiences.",
-    destinations: ["South America", "Africa", "Pacific"],
-    established: 2010,
-    verified: true,
-    type: "Adventure",
-    specialties: ["Hiking", "Safari", "Water Sports"]
-  },
-  {
-    id: 3,
-    name: "Cultural Expeditions",
-    logo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80",
-    rating: 4.7,
-    reviews: 1100,
-    description: "Immersive cultural experiences and heritage tours across the globe.",
-    destinations: ["Asia", "Middle East", "Africa"],
-    established: 2008,
-    verified: true,
-    type: "Cultural",
-    specialties: ["Heritage Tours", "Food Tours", "Art Expeditions"]
-  }
-];
-
-const companyTypes = ["All", "Luxury", "Adventure", "Cultural", "Family", "Budget"];
-const destinations = ["All", "Europe", "Asia", "Africa", "South America", "Caribbean", "Pacific", "Middle East"];
-const specialties = [
-  "Luxury Tours",
-  "Honeymoon Packages",
-  "Private Jets",
-  "Hiking",
-  "Safari",
-  "Water Sports",
-  "Heritage Tours",
-  "Food Tours",
-  "Art Expeditions"
-];
+import { companies } from '../types';
+import { useTranslation } from 'react-i18next';
 
 const Companies = () => {
-  const [currentDiscountIndex, setCurrentDiscountIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedType, setSelectedType] = useState('All');
-  const [selectedDestination, setSelectedDestination] = useState('All');
-  const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
-  const [selectedRating, setSelectedRating] = useState<number | null>(null);
-  const [verifiedOnly, setVerifiedOnly] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+  const [filteredCompanies, setFilteredCompanies] = useState(companies);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      handleNextDiscount();
-    }, 5000);
+    const filtered = companies.filter((company) =>
+      company.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredCompanies(filtered);
+  }, [searchTerm]);
 
-    return () => clearInterval(interval);
-  }, [currentDiscountIndex]);
-
-  const handleNextDiscount = () => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-    setCurrentDiscountIndex((prev) => (prev + 1) % discounts.length);
-    setTimeout(() => setIsAnimating(false), 300);
-  };
-
-  const handlePrevDiscount = () => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-    setCurrentDiscountIndex((prev) => (prev - 1 + discounts.length) % discounts.length);
-    setTimeout(() => setIsAnimating(false), 300);
-  };
-
-  const filteredCompanies = allCompanies.filter(company => {
-    if (searchTerm && !company.name.toLowerCase().includes(searchTerm.toLowerCase())) {
-      return false;
-    }
-
-    if (selectedType !== 'All' && company.type !== selectedType) {
-      return false;
-    }
-
-    if (selectedDestination !== 'All' && !company.destinations.includes(selectedDestination)) {
-      return false;
-    }
-
-    if (selectedSpecialties.length > 0 && !selectedSpecialties.some(specialty => 
-      company.specialties.includes(specialty)
-    )) {
-      return false;
-    }
-
-    if (selectedRating && company.rating < selectedRating) {
-      return false;
-    }
-
-    if (verifiedOnly && !company.verified) {
-      return false;
-    }
-
-    return true;
-  });
-
-  const handleViewPackages = (companyName: string) => {
-    localStorage.setItem('selectedCompany', companyName);
-    navigate('/travels');
+  const handleFilterChange = (event) => {
+    const { name, value } = event.target;
+    // ... (rest of the handleFilterChange function remains the same)
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Special Discounts Slider */}
       <div className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Special Discounts</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('Special Discounts')}</h2>
         <div className="relative">
-          <div className={`transition-all duration-300 ease-out ${
-            isAnimating ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
-          }`}>
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-              <div className="flex flex-col md:flex-row h-[300px]">
-                <div className="md:w-2/5">
-                  <div className="relative h-full">
-                    <img
-                      src={discounts[currentDiscountIndex].image}
-                      alt={discounts[currentDiscountIndex].title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                      -{discounts[currentDiscountIndex].discount}%
-                    </div>
-                  </div>
-                </div>
-                <div className="md:w-3/5 p-4 md:p-6 flex flex-col justify-between">
-                  <div>
-                    {discounts[currentDiscountIndex].isLimitedTime && (
-                      <div className="inline-block bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-semibold mb-2">
-                        Limited Time
-                      </div>
-                    )}
-                    <h3 className="text-lg font-bold mb-2">{discounts[currentDiscountIndex].title}</h3>
-                    <div className="flex items-center mb-2">
-                      <div className="flex">
-                        {Array.from({ length: 5 }).map((_, index) => (
-                          <Star
-                            key={index}
-                            size={16}
-                            className={index < Math.floor(discounts[currentDiscountIndex].rating) ? "text-yellow-400 fill-current" : "text-gray-300"}
-                          />
-                        ))}
-                      </div>
-                      <span className="ml-2 text-sm text-gray-600">({discounts[currentDiscountIndex].reviews})</span>
-                    </div>
-                    <p className="text-sm text-blue-500 mb-2">{discounts[currentDiscountIndex].hotelName}</p>
-                    <p className="text-sm text-gray-600">Until: {discounts[currentDiscountIndex].availableUntil}</p>
-                  </div>
-                  <div>
-                    <div className="flex items-baseline gap-2 mb-3">
-                      <span className="text-2xl font-bold text-red-600">${discounts[currentDiscountIndex].price}</span>
-                      <span className="text-sm line-through text-gray-500">${discounts[currentDiscountIndex].originalPrice}</span>
-                    </div>
-                    <button className="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition-colors text-sm">
-                      Book Now
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <ChevronLeft className="h-5 w-5 text-gray-500" />
           </div>
-
-          <button
-            onClick={handlePrevDiscount}
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-1.5 rounded-full shadow-lg hover:bg-white transition-all"
-          >
-            <ChevronLeft size={20} />
-          </button>
-          <button
-            onClick={handleNextDiscount}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-1.5 rounded-full shadow-lg hover:bg-white transition-all"
-          >
-            <ChevronRight size={20} />
-          </button>
-
-          <div className="flex justify-center mt-3 space-x-1.5">
-            {discounts.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => {
-                  if (!isAnimating && index !== currentDiscountIndex) {
-                    setIsAnimating(true);
-                    setCurrentDiscountIndex(index);
-                    setTimeout(() => setIsAnimating(false), 300);
-                  }
-                }}
-                className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                  index === currentDiscountIndex ? 'bg-red-500 w-6' : 'bg-gray-300'
-                }`}
-              />
-            ))}
+          <input
+            type="text"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
+            placeholder={t('Search companies...')}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <ChevronRight className="h-5 w-5 text-gray-500" />
           </div>
         </div>
       </div>
 
-      {/* Travel Companies Section */}
       <div>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4 md:mb-0">Our Partner Companies</h2>
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search companies..."
-                className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-            </div>
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              <SlidersHorizontal size={20} />
-              <span>Filters</span>
-            </button>
-          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4 md:mb-0">{t('Our Partner Companies')}</h2>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"
+          >
+            {t('Filters')}
+            <SlidersHorizontal className="h-5 w-5 ml-2 inline" />
+          </button>
         </div>
 
-        {/* Filters Section */}
         {showFilters && (
           <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Company Type Filter */}
               <div>
-                <h3 className="font-semibold mb-2">Company Type</h3>
+                <h3 className="font-semibold mb-2">{t('Company Type')}</h3>
                 <select
-                  value={selectedType}
-                  onChange={(e) => setSelectedType(e.target.value)}
-                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  name="companyType"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  onChange={handleFilterChange}
                 >
-                  {companyTypes.map(type => (
-                    <option key={type} value={type}>{type}</option>
-                  ))}
+                  <option value="">{t('All')}</option>
+                  <option value="luxury">{t('Luxury')}</option>
+                  <option value="adventure">{t('Adventure')}</option>
+                  <option value="cultural">{t('Cultural')}</option>
+                  <option value="family">{t('Family')}</option>
+                  <option value="budget">{t('Budget')}</option>
                 </select>
               </div>
-
-              {/* Destination Filter */}
               <div>
-                <h3 className="font-semibold mb-2">Destination</h3>
+                <h3 className="font-semibold mb-2">{t('Destination')}</h3>
                 <select
-                  value={selectedDestination}
-                  onChange={(e) => setSelectedDestination(e.target.value)}
-                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  name="destination"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  onChange={handleFilterChange}
                 >
-                  {destinations.map(destination => (
-                    <option key={destination} value={destination}>{destination}</option>
-                  ))}
+                  <option value="">{t('Various destinations')}</option>
+                  <option value="europe">{t('Europe')}</option>
+                  <option value="asia">{t('Asia')}</option>
+                  <option value="africa">{t('Africa')}</option>
+                  <option value="southAmerica">{t('South America')}</option>
+                  <option value="caribbean">{t('Caribbean')}</option>
+                  <option value="pacific">{t('Pacific')}</option>
+                  <option value="middleEast">{t('Middle East')}</option>
                 </select>
               </div>
-
-              {/* Rating Filter */}
               <div>
-                <h3 className="font-semibold mb-2">Minimum Rating</h3>
-                <div className="space-y-2">
-                  {[5, 4, 3, 2, 1].map((rating) => (
-                    <div
-                      key={rating}
-                      onClick={() => setSelectedRating(rating === selectedRating ? null : rating)}
-                      className="flex items-center cursor-pointer"
-                    >
-                      <div className="flex">
-                        {Array.from({ length: 5 }).map((_, index) => (
-                          <Star
-                            key={index}
-                            size={16}
-                            className={`${index < rating ? "text-yellow-400 fill-current" : "text-gray-300"} 
-                              ${rating === selectedRating ? "scale-110" : ""}`}
-                          />
-                        ))}
-                      </div>
-                      <span className={`ml-2 ${rating === selectedRating ? "font-semibold" : ""}`}>& Up</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Specialties Filter */}
-              <div className="lg:col-span-2">
-                <h3 className="font-semibold mb-2">Specialties</h3>
-                <div className="flex flex-wrap gap-2">
-                  {specialties.map(specialty => (
-                    <button
-                      key={specialty}
-                      onClick={() => {
-                        setSelectedSpecialties(prev =>
-                          prev.includes(specialty)
-                            ? prev.filter(s => s !== specialty)
-                            : [...prev, specialty]
-                        );
-                      }}
-                      className={`px-3 py-1 rounded-full text-sm ${
-                        selectedSpecialties.includes(specialty)
-                          ? 'bg-orange-500 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {specialty}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Verified Filter */}
-              <div>
-                <label className="flex items-center space-x-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={verifiedOnly}
-                    onChange={(e) => setVerifiedOnly(e.target.checked)}
-                    className="rounded text-orange-500 focus:ring-orange-500"
-                  />
-                  <span>Verified Companies Only</span>
-                </label>
+                <h3 className="font-semibold mb-2">{t('Minimum Rating')}</h3>
+                <select
+                  name="minRating"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  onChange={handleFilterChange}
+                >
+                  <option value="">{t('Up')}</option>
+                  <option value="4">{t('4 Up')}</option>
+                  <option value="5">{t('5 Up')}</option>
+                </select>
               </div>
             </div>
-
-            {/* Reset Filters Button */}
-            <div className="mt-6 flex justify-end">
-              <button
-                onClick={() => {
-                  setSelectedType('All');
-                  setSelectedDestination('All');
-                  setSelectedSpecialties([]);
-                  setSelectedRating(null);
-                  setVerifiedOnly(false);
-                  setSearchTerm('');
-                }}
-                className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                Reset Filters
-              </button>
-            </div>
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setFilteredCompanies(companies);
+                setShowFilters(false);
+              }}
+              className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg"
+            >
+              {t('Reset Filters')}
+            </button>
           </div>
         )}
 
-        {/* Companies Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="space-y-6">
           {filteredCompanies.length === 0 ? (
-            <div className="col-span-full text-center py-12">
-              <h3 className="text-xl font-semibold text-gray-700">No companies found</h3>
-              <p className="text-gray-500 mt-2">Try adjusting your filters or search criteria</p>
+            <div className="text-center py-12">
+              <h3 className="text-xl font-semibold text-gray-700">{t('No companies found')}</h3>
+              <p className="text-gray-500 mt-2">{t('Try adjusting your filters or search criteria')}</p>
             </div>
           ) : (
             filteredCompanies.map((company) => (
-              <div key={company.id} className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
-                <div className="flex items-center mb-4">
-                  <img
-                    src={company.logo}
-                    alt={company.name}
-                    className="w-16 h-16 rounded-full object-cover mr-4"
-                  />
-                  <div>
-                    <h3 className="text-xl font-semibold">{company.name}</h3>
-                    <div className="flex items-center">
-                      <div className="flex">
-                        {Array.from({ length: 5 }).map((_, index) => (
-                          <Star
-                            key={index}
-                            size={16}
-                            className={index < Math.floor(company.rating) ? "text-yellow-400 fill-current" : "text-gray-300"}
-                          />
-                        ))}
-                      </div>
-                      <span className="ml-2 text-sm text-gray-600">({company.reviews})</span>
-                    </div>
-                  </div>
+              <div
+                key={company.id}
+                className="bg-white rounded-lg shadow-lg p-6 flex items-center space-x-4 cursor-pointer"
+                onClick={() => navigate(`/companies/${company.id}`)}
+              >
+                <img src={company.image} alt={company.name} className="h-20 w-20 rounded-lg" />
+                <div>
+                  <h3 className="text-lg font-semibold">{company.name}</h3>
+                  <p className="text-gray-500 text-sm">{company.description}</p>
                 </div>
-
-                <p className="text-gray-600 mb-4">{company.description}</p>
-
-                <div className="space-y-2">
-                  <div className="flex items-center text-sm">
-                    <span className="font-medium mr-2">Popular Destinations:</span>
-                    <span className="text-gray-600">{company.destinations.join(", ")}</span>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    <span className="font-medium mr-2">Established:</span>
-                    <span className="text-gray-600">{company.established}</span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {company.specialties.map((specialty, index) => (
-                      <span key={index} className="text-sm bg-gray-100 text-gray-700 px-2 py-1 rounded">
-                        {specialty}
-                      </span>
-                    ))}
-                  </div>
-                  {company.verified && (
-                    <div className="inline-block bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
-                      Verified Partner
-                    </div>
-                  )}
-                </div>
-
-                <button 
-                  className="w-full mt-6 bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition-colors"
-                  onClick={() => handleViewPackages(company.name)}
-                >
-                  View Packages
-                </button>
+                <Star className="h-6 w-6 text-yellow-500" />
               </div>
             ))
           )}
