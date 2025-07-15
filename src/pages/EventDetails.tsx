@@ -9,17 +9,18 @@ import { useParams, useNavigate } from "react-router-dom";
 
 interface EventData {
   id: number;
-  title: string;
-  category: string | null;
-  dates: string;
-  date: string | null;
-  location: string;
-  link: string;
+  name: string;
+  category?: string | null;
+  dates?: string;
+  date?: string | null;
+  location?: string;
+  link?: string;
   image: string;
-  map_Link: string | null;
-  type: string | null;
-  description: string;
-  travelTips: string;
+  map_Link?: string | null;
+  type?: string | null;
+  description?: string;
+  travelTips?: string;
+  title?: string; // Alternative to name
 }
 
 const EventDetails = () => {
@@ -39,6 +40,7 @@ const EventDetails = () => {
           throw new Error("Event ID is missing");
         }
         const data = await fetchEventById(parseInt(id));
+        console.log("API Response:", data); // Debugging
         setEvent(data);
       } catch (err) {
         console.error("Failed to load event:", err);
@@ -144,7 +146,7 @@ const EventDetails = () => {
               ? event.image
               : `${baseImageUrl}${event.image}`
           }
-          alt={event.title}
+          alt={event.title || event.name || "Event"}
           className="w-full h-full object-cover"
           onError={(e) => {
             (e.target as HTMLImageElement).src = "/default-event.jpg";
@@ -177,13 +179,15 @@ const EventDetails = () => {
 
         {/* Event Title and Basic Info */}
         <div className="absolute bottom-0 left-0 right-0 p-8 pb-32 bg-gradient-to-t from-black via-black/90 to-transparent">
-          <h1 className="text-5xl font-bold mb-4">{event.title}</h1>
+          <h1 className="text-5xl font-bold mb-4">{event.title || event.name}</h1>
           
           {/* Event Dates */}
-          <div className="flex items-center gap-3 text-white/90 text-xl mb-4">
-            <FaCalendarAlt className="text-blue-400" />
-            <span className="font-medium">{event.dates}</span>
-          </div>
+          {(event.dates || event.date) && (
+            <div className="flex items-center gap-3 text-white/90 text-xl mb-4">
+              <FaCalendarAlt className="text-blue-400" />
+              <span className="font-medium">{event.dates || event.date}</span>
+            </div>
+          )}
           
           {/* Event Location */}
           {event.location && (
