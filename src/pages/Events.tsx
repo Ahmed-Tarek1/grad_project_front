@@ -1,119 +1,160 @@
-import React from 'react';
-import { saveInteraction } from '../services/localStorageService';
-import { calculateTotal } from '../services/calculationService';
-import { UserInteraction } from '../interfaces/userInteraction';
+import { useEffect, useState } from "react";
+import { fetchEvents } from "../services/eventService";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { saveInteraction } from "../services/localStorageService";
+import { authService } from "../services/authService";
+import { UserInteraction } from "../interfaces/userInteraction";
+import { calculateTotal } from "../services/calculationService";
+import { useNavigate } from "react-router-dom"; // أضف هذا الاستيراد
+
+interface EventData {
+  id: number;
+  name: string;
+  date: string;
+  description: string;
+  travelTips: string;
+  image: string;
+}
 
 const Events = () => {
-  const events = [
-    {
-      id: 'event_1',
-      name: 'Abu Simbel Sun Festival',
-      date: 'February 22 & October 22',
-      description: 'A remarkable event where the sun illuminates the inner sanctuary of the Abu Simbel temple.',
-      travelTips: 'Book accommodations in advance. Arrive early to secure a good viewing spot.',
-      image: 'https://kemetexperience.com/wp-content/uploads/2019/02/AsSoundLight-1024x683.jpg',
-    },
-    {
-      id: 'event_2',
-      name: 'Cairo International Film Festival',
-      date: 'November/December',
-      description: 'One of the oldest and most prestigious film festivals in the Middle East.',
-      travelTips: 'Check the festival schedule for screenings and events. Purchase tickets in advance.',
-      image: 'https://vitrina.ai/wp-content/uploads/2025/01/CIFF.jpg',
-    },
-    {
-      id: 'event_3',
-      name: 'Wafaa Al-Nil Festival',
-      date: 'August',
-      description: 'An ancient festival celebrating the Nile River, featuring cultural performances and traditional rituals.',
-      travelTips: 'Experience local traditions and enjoy the festive atmosphere along the Nile.',
-      image: 'https://pbs.twimg.com/media/CMY6eWFWEAAuBoh?format=jpg&name=4096x4096',
-    },
-    {
-      id: 'event_4',
-      name: 'Cairo Marathon',
-      date: 'December',
-      description: 'An exciting annual marathon that runs through historic Cairo landmarks, attracting runners from around the world.',
-      travelTips: 'Register early to participate or cheer. Stay hydrated and enjoy the scenic route through the city’s iconic sites.',
-      image: 'https://www.sportseventsegypt.com/wp-content/uploads/2022/06/running-race.jpg',
-    },
-    {
-      id: 'event_5',
-      name: 'International Festival for Drums and Traditional Arts',
-      date: 'April/May',
-      description: 'A celebration of drumming and traditional arts from around the world, held in Cairo.',
-      travelTips: 'Attend the diverse performances and workshops. Explore the cultural exchange.',
-      image: 'https://www.sis.gov.eg/Content/Upload/slider/5202328111923677.jpg',
-    },
-  ];
+  const [events, setEvents] = useState<EventData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [likedEvents, setLikedEvents] = useState<number[]>([]);
+  const baseImageUrl = "https://journeymate.runasp.net";
+  const userId = authService.getUserIdFromToken() || 'anonymous';
+  const navigate = useNavigate(); // استخدم useNavigate للتنقل
 
-  const handleEventClick = (eventId: string) => {
-    const interaction: UserInteraction = {
-      id: eventId,
-      type: 'event',
-      checkout: 1,
-      favourite: false,
-      booked: false,
-      total: 0
+  useEffect(() => {
+    const loadEvents = async () => {
+      try {
+        const data = await fetchEvents();
+        setEvents(data);
+      } catch (err) {
+        console.error("Failed to load events:", err);
+        setError("Failed to load events.");
+      } finally {
+        setLoading(false);
+      }
     };
-    interaction.total = calculateTotal(interaction);
-    saveInteraction(interaction);
-    console.log(`Event ${eventId} clicked`);
-  };
 
-  const handleFavorite = (eventId: string) => {
-    console.log(`Event ${eventId} favorited`);
+    loadEvents();
+  }, []);
+
+  const toggleLike = (eventId: number) => {
+    const isCurrentlyLiked = likedEvents.includes(eventId);
+    const newLikedStatus = !isCurrentlyLiked;
+
+    setLikedEvents(prev => 
+      newLikedStatus 
+        ? [...prev, eventId]
+        : prev.filter(id => id !== eventId)
+    );
+
     const interaction: UserInteraction = {
-      id: eventId,
-      type: 'event',
+      userId,
+      id: eventId.toString(),
+      type: "event",
       checkout: 0,
-      favourite: true,
+      favourite: newLikedStatus,
       booked: false,
-      total: 0
+      total: calculateTotal({
+        userId,
+        id: eventId.toString(),
+        type: "event",
+        checkout: 0,
+        favourite: newLikedStatus,
+        booked: false,
+        total: 0
+      })
     };
-    interaction.total = calculateTotal(interaction);
+
     saveInteraction(interaction);
   };
+
+  const requireAuth = (action: () => void) => {
+    if (!authService.isAuthenticated()) {
+      if (window.confirm('You need to login first. Do you want to login now?')) {
+        window.location.href = '/login';
+      }
+      return false;
+    }
+    action();
+    return true;
+  };
+
+  const handleLikeClick = (eventId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    requireAuth(() => {
+      toggleLike(eventId);
+    });
+  };
+
+  const handleCardClick = (eventId: number) => {
+    navigate(`/events/${eventId}`); // التنقل إلى صفحة الحدث المحدد
+  };
+
+  if (loading) return <p className="p-4">Loading events...</p>;
+  if (error) return <p className="p-4 text-red-500">{error}</p>;
 
   return (
-    <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-10">
-      <h1 className="text-4xl font-extrabold mb-8 text-center text-indigo-800">Famous Events in Egypt</h1>
-      <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <h1 className="text-6xl font-bold text-[#DF6951] mb-4 font-yesteryear text-center">
+        Events That Shape Egypt
+      </h1>
+      <p className="text-lg text-gray-600 font-volkhov text-center mb-8">
+        From ancient traditions to modern festivals, explore what makes Egypt come alive.
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {events.map((event) => (
-          <li
+          <div
             key={event.id}
-            onClick={() => handleEventClick(event.id)}
-            className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-shadow cursor-pointer flex flex-col"
+            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow relative cursor-pointer" // أضفت cursor-pointer هنا
+            onClick={() => handleCardClick(event.id)} // أضفت حدث النقر هنا
           >
-            <div className="relative">
-              <img
-                src={event.image}
-                alt={event.name}
-                className="w-full h-72 object-cover rounded-t-xl"
-                loading="lazy"
-              />
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleFavorite(event.id);
-                }}
-                aria-label="Add to favorites"
-                className="absolute top-4 right-4 bg-white bg-opacity-75 rounded-full p-2 text-red-500 hover:text-red-600 shadow"
-              >
-                ♡
-              </button>
+            <img
+              src={
+                event.image?.startsWith("http")
+                  ? event.image
+                  : `${baseImageUrl}${event.image}`
+              }
+              alt={event.name}
+              className="w-full h-48 object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "/default-event.jpg";
+              }}
+            />
+            
+            <button
+              onClick={(e) => handleLikeClick(event.id, e)}
+              className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors"
+              aria-label={likedEvents.includes(event.id) ? "Unlike" : "Like"}
+            >
+              {likedEvents.includes(event.id) ? (
+                <FaHeart className="text-red-500 text-xl" />
+              ) : (
+                <FaRegHeart className="text-gray-600 text-xl hover:text-red-500" />
+              )}
+            </button>
+            
+            <div className="p-4">
+              <div className="flex justify-between items-start mb-2">
+                <h2 className="text-xl font-semibold">{event.name}</h2>
+                <p className="text-gray-600 text-sm">{event.date}</p>
+              </div>
+              
+              <p className="text-gray-700 mb-3 line-clamp-3">{event.description}</p>
+              
+              <div className="mt-4 pt-2 border-t border-gray-100">
+                <p className="text-sm text-gray-600">
+                  <strong className="text-gray-800">Travel Tips:</strong> {event.travelTips}
+                </p>
+              </div>
             </div>
-            <div className="p-6 flex flex-col flex-grow">
-              <h2 className="text-2xl font-semibold mb-1 text-indigo-700">{event.name}</h2>
-              <p className="text-sm text-gray-500 mb-3">{event.date}</p>
-              <p className="text-gray-700 flex-grow">{event.description}</p>
-              <p className="mt-4 text-sm text-gray-600">
-                <strong>Travel Tips:</strong> {event.travelTips}
-              </p>
-            </div>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

@@ -25,7 +25,7 @@ const egyptianCities: City[] = [
     id: 2,
     name: "Luxor",
     description: "Often called the world's greatest open-air museum, featuring incredible temples and tombs from ancient Thebes.",
-    image: "https://images.unsplash.com/photo-1526666923127-b2970f64b422?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+    image: "https://www.egypttoursportal.com/images/2017/11/luxor-the-ancient-city-egypt-tours-portal.jpg",
     route: "/luxor",
     highlights: ["Karnak Temple", "Valley of the Kings", "Luxor Temple", "Hatshepsut Temple"],
     bestFor: "Archaeology enthusiasts"
@@ -34,7 +34,7 @@ const egyptianCities: City[] = [
     id: 3,
     name: "Aswan",
     description: "A picturesque Nile-side city with Nubian culture, granite quarries, and beautiful islands.",
-    image: "https://images.unsplash.com/photo-1580502304784-8985b7eb7260?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+    image: "https://cf.bstatic.com/xdata/images/hotel/max1024x768/428431945.jpg?k=659c830e36357a7c97ca20bc48141da106848ee1f735ff4fc3ce8f3502ff34de&o=&hp=1",
     route: "/aswan",
     highlights: ["Philae Temple", "Aswan High Dam", "Nubian Village", "Elephantine Island"],
     bestFor: "Relaxed Nile views & Nubian culture"
@@ -43,7 +43,7 @@ const egyptianCities: City[] = [
     id: 4,
     name: "Alexandria",
     description: "Egypt's Mediterranean jewel with Greco-Roman history, modern cafes, and beautiful seaside promenades.",
-    image: "https://images.unsplash.com/photo-1602088113235-229c19758e9f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+    image: "https://www.hurghadareisen.com/wp-content/uploads/2020/02/Alexandria-second-largest-city-in-Egypt-rich-historical.jpg",
     route: "/alexandria",
     highlights: ["Bibliotheca Alexandrina", "Qaitbay Citadel", "Catacombs of Kom El Shoqafa", "Montaza Palace"],
     bestFor: "Mediterranean vibes & history"
@@ -52,7 +52,7 @@ const egyptianCities: City[] = [
     id: 5,
     name: "Sharm El Sheikh",
     description: "Egypt's premier Red Sea resort town, famous for its coral reefs, nightlife, and desert excursions.",
-    image: "https://images.unsplash.com/photo-1527631746610-bca00a040d60?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+    image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/25/03/8e/75/rixos-premium-seagate.jpg?w=1200&h=-1&s=1",
     route: "/sharm",
     highlights: ["Naama Bay", "Ras Mohammed National Park", "Mount Sinai", "Colored Canyon"],
     bestFor: "Diving & beach vacations"
@@ -61,7 +61,7 @@ const egyptianCities: City[] = [
     id: 6,
     name: "Hurghada",
     description: "Another Red Sea paradise offering world-class diving, water sports, and desert adventures.",
-    image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+    image: "https://media-cdn.tripadvisor.com/media/photo-s/2a/ab/0f/3c/caption.jpg",
     route: "/hurghada",
     highlights: ["Giftun Islands", "Mahmya Island", "Hurghada Marina", "Desert Safari"],
     bestFor: "Family beach holidays"
@@ -76,7 +76,7 @@ const Cities = () => {
       {/* Hero Image Section */}
       <div className="relative w-full h-screen overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1580077873521-dc86339ef022?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80"
+          src="https://t4.ftcdn.net/jpg/02/72/61/45/360_F_272614583_1aA0sKnF91rMj4uWZQegqsPc7AY72gEt.jpg"
           alt="Egyptian Cities Landscape"
           className="absolute inset-0 w-full h-full object-cover"
         />

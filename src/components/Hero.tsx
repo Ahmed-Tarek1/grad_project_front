@@ -18,7 +18,7 @@ const Hero = () => {
         className="absolute inset-0 h-[600px] bg-cover bg-center"
         style={{
           backgroundImage:
-            'url("https://images.unsplash.com/photo-1512453979798-5ea266f8880c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80")',
+            'url("https://static.standard.co.uk/2025/05/14/15/25/Cairo-Egypt.jpeg?width=1200&auto=webp&quality=75&trim=132,0,1,0")',
         }}
       >
         <div className="absolute inset-0 bg-black opacity-40"></div>
@@ -71,7 +71,7 @@ const Hero = () => {
           />
           <CategoryButton icon="🏔️" label="Mountains" onClick={() => navigate('/mountains')}  />
           <CategoryButton icon="🌆" label="Cities"  onClick={() => navigate('/cities')}/>
-          <CategoryButton icon="🏺" label="Museums" />
+          <CategoryButton icon="🏺" label="Museums" onClick={()=> navigate('/museums')} />
         </div>
       </div>
     </div>

@@ -10,19 +10,23 @@ import Testimonials from '../components/Testimonials';
 import DiscountedTours from '../components/DiscountedTours';
 import LeavingSoonTours from '../components/LeavingSoonTours';
 import NewestTours from '../components/NewestTours';
-import AITravel from '../components/AiTravel';
+import AITravel from '../components/AITravel';
+import AIEvents from '../components/AiEvents';
 const Home = () => {
   return (
     <>
       <Hero />
       <Partners />
+
       <ServicesSection />
+      <AIEvents />  
+      <TrendingTours />
       <DiscountedTours/>
       <AITravel />
       <LeavingSoonTours/>
       <RomanticDestination />
       <NewestTours/>
-      <TrendingTours />
+      
        <PopularDestinations />
       <Testimonials />
     </>

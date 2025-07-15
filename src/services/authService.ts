@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_BASE_URL = 'https://journeymate.runasp.net/api/Auth';
-const GOOGLE_CLIENT_ID = '822773664134-n09666thqoc67ee4rhkfjetb51ep0vg5.apps.googleusercontent.com';
+// const GOOGLE_CLIENT_ID = '822773664134-n09666thqoc67ee4rhkfjetb51ep0vg5.apps.googleusercontent.com';
 const RESET_PASSWORD_URL = 'http://localhost:5173/reset-password?';
 
 interface AuthResponse {

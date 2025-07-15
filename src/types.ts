@@ -107,7 +107,20 @@ export interface Tour {
   itineraries?: Itinerary[];
   categoryId?: number;
 }
-
+export interface Event {
+  id: number;
+  title: string;
+  category: string;
+  dates?: string | null;
+  date: string;
+  location: string;
+  link: string;
+  image: string;
+  map_Link?: string | null;
+  type?: string | null;
+  description?: string | null;
+  url?: string | null;
+}
 
 export interface Category {
   id: number;

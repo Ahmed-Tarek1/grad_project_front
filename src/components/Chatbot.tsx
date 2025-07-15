@@ -170,10 +170,10 @@ const Chatbot = () => {
     toggleChat(); // Close the chat when navigating
   };
 
-  const handleEventClick = (eventId: number) => {
-    navigate(`/event-details`, { state: { id: eventId } });
-    toggleChat(); // Close the chat when navigating
-  };
+ const handleEventClick = (eventId: number) => {
+  navigate(`/events/${eventId}`);
+  toggleChat();
+};
 
   return (
     <div className="fixed bottom-8 right-8 z-[9999]">

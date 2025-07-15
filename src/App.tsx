@@ -14,15 +14,14 @@ import Account from './pages/account';
 import ContactUsForm from './pages/ContactUsForm';
 import GetInTouch from './pages/GetInTouch';
 import CompaniesPage from './pages/CompaniesPage';
-import PaymentPage from './pages/PaymentPage';
-import PaymentSuccess from "./pages/PaymentSuccess";
-import PaymentFailed from "./pages/PaymentFailed";
+
 import Favorites from './pages/Favorites';
 import { FavoritesProvider } from './context/FavoritesContext';
 import Partners from './components/Partners';
 
 import Companies from './pages/Companies';
 import Events from './pages/Events';
+import EventDetails from './pages/EventDetails';
 import { setupWeeklySubmission } from './services/schedulerService';
 import { UserProvider } from './context/UserContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -32,8 +31,9 @@ import AllTours from './components/AllTours';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { ChatbotProvider } from './context/ChatbotContext';
 import Chatbot from './components/Chatbot';
-import Mountains from './ConstantsPages/Mountains';
 
+
+import Mountains from './ConstantsPages/Mountains';
 import About from './ConstantsPages/About';
 import Beaches from './ConstantsPages/Beaches';
 import Heritage from './ConstantsPages/Heritage';
@@ -42,8 +42,16 @@ import LuxorTemplePage from './ConstantsPages/LuxorTemple';
 import NuweibaPage from './ConstantsPages/NuweibaPage';
 import Cities from './ConstantsPages/Cities';
 import SiwaPage from './ConstantsPages/SiwaPage';
+import Museums from './ConstantsPages/Museums';
 import { extractUserIdFromToken } from './services/authService';
-import { HubConnectionBuilder } from '@microsoft/signalr';
+
+
+import NewBookingPage from "./pages/NewBookingPage";
+import UserBookingsPage from "./pages/UserBookingsPage";
+import PaymentPage from "./pages/PaymentPage";
+import PaymentStatus from "./pages/PaymentStatus";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFailed from "./pages/PaymentFailed";
 
 const GOOGLE_CLIENT_ID = '822773664134-n09666thqoc67ee4rhkfjetb51ep0vg5.apps.googleusercontent.com';
 
@@ -92,6 +100,7 @@ function App() {
                     
                     <Route path="/companies" element={<Companies />} />
                     <Route path="/events" element={<Events />} />
+                    <Route path="/events/:id" element={<EventDetails />} />
                     <Route path="/tours" element={<AllTours />} />
 
                     <Route path="/nuweiba" element={<NuweibaPage />} />
@@ -106,6 +115,7 @@ function App() {
                     <Route path="/beaches" element={<Beaches />} />
                     <Route path="/mountains" element={<Mountains />} />
                     <Route path="/cities" element={<Cities />} />
+                    <Route path="/museums" element={<Museums />} />
 
                     {/* Fallback route for unmatched paths */}
 
@@ -113,10 +123,20 @@ function App() {
 
 
                     <Route element={<ProtectedRoute />}>
-                      <Route path="/payment" element={<PaymentPage />} />
-                      <Route path="/favorites" element={<Favorites />} />
-                      <Route path="/payment/success" element={<PaymentSuccess />} />
-                      <Route path="/payment/failed" element={<PaymentFailed />} />
+                  
+                    <Route path="/payment" element={<PaymentPage />} />
+                    <Route path="/payment-status" element={<PaymentStatus />} />
+                    <Route path="/book-now" element={<NewBookingPage />} />
+                    <Route path="/my-bookings" element={<UserBookingsPage />} />
+
+                    <Route path="/favorites" element={<Favorites />} />
+                    
+                    <Route
+                      path="/payment-success"
+                      element={<PaymentSuccess />}
+                    />
+                    <Route path="/payment-failed" element={<PaymentFailed />} />
+
                     </Route>
                   </Routes>
                 </main>
