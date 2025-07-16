@@ -313,7 +313,7 @@ const Chatbot = () => {
 };
 
   return (
-    <div className="fixed bottom-5 right-4 z-[9999]">
+    <div className="fixed bottom-5 right-5 z-[9999]">
       {!isChatOpen && (
         <button
           onClick={toggleChat}
