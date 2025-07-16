@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect, useRef } from 'react';
-import { FaMicrophone, FaPaperPlane } from 'react-icons/fa';
+import { FaMicrophone, FaTelegramPlane } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { ChatbotContext } from '../context/ChatbotContext';
 import kemetImage from '../assets/images/weeeeeeeeeee.jpg';
@@ -313,24 +313,26 @@ const Chatbot = () => {
 };
 
   return (
-    <div className="fixed bottom-8 right-8 z-[9999]">
-      <button
-        onClick={toggleChat}
-        className={`w-20 h-20 rounded-full bg-[#DF6951] text-white flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 ${
-          !isChatOpen ? 'animate-float' : ''
-        }`}
-        aria-label="Toggle chatbot"
-      >
-        <img 
-          src={kemetImage} 
-          alt="Kemet Assistant" 
-          className="w-16 h-16 rounded-full object-cover"
-        />
-      </button>
+    <div className="fixed bottom-5 right-4 z-[9999]">
+      {!isChatOpen && (
+        <button
+          onClick={toggleChat}
+          className={`w-18 h-18 rounded-full bg-[#DF6951] text-white flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 ${
+            !isChatOpen ? 'animate-float' : ''
+          }`}
+          aria-label="Toggle chatbot"
+        >
+          <img 
+            src={kemetImage} 
+            alt="Kemet Assistant" 
+            className="w-16 h-16 rounded-full object-cover"
+          />
+        </button>
+      )}
 
       {isChatOpen && (
         <div 
-          className="w-[370px] h-[500px] bg-white rounded-t-lg rounded-bl-lg shadow-xl flex flex-col absolute bottom-20 right-0 overflow-hidden"
+          className="w-[375px] h-[540px] bg-white rounded-t-lg rounded-bl-lg shadow-xl flex flex-col absolute bottom-5 right-0 overflow-hidden"
           style={{ 
             clipPath: 'polygon(0 0, 100% 0, 100% 100%, 20px 100%, 0 calc(100% - 20px))',
             boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
@@ -476,48 +478,58 @@ const Chatbot = () => {
             )}
           </div>
     
-          <div className="border-t border-gray-200 p-3 bg-white flex items-center gap-2">
-            <input
-              type="text"
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder={selectedLanguage === 'ar-EG' ? "اسأل عن مصر ..." : "Ask about Egypt..."}
-              dir={selectedLanguage === 'ar-EG' ? 'rtl' : 'ltr'}
-              className="flex-1 border border-gray-300 rounded-lg px-4 h-12 text-sm focus:outline-none focus:ring-1 focus:ring-[#DF6951] transition-all duration-150"
-              disabled={isLoading}
-            />
-
-            <button
-              onClick={() => handleVoiceStart(selectedLanguage)}
-              className={`w-8 h-10 p-1 flex items-center justify-center rounded-md	 transition-all duration-200 ${
-                listening
-                  ? 'bg-red-100 ring-2 ring-red-400 animate-pulse'
-                  : 'bg-[#DF6951] hover:bg-[#C55A42]'
+          <div className="border-t border-gray-200 p-3 bg-white">
+            <div
+              className={`flex items-center gap-2 border border-gray-300 rounded-xl px-4 py-3.5 bg-white transition-all duration-200 ${
+                selectedLanguage === 'ar-EG' ? 'flex-row-reverse' : 'flex-row'
               }`}
-              aria-label="Tap to speak"
             >
-              <FaMicrophone size={18} className={listening ? 'text-red-600' : 'text-white'} />
-            </button>
+              {/* Text Input */}
+              <input
+                type="text"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                placeholder={selectedLanguage === 'ar-EG' ? "اسأل عن مصر ..." : "Ask about Egypt ..."}
+                dir={selectedLanguage === 'ar-EG' ? 'rtl' : 'ltr'}
+                className="flex-1 text-sm bg-transparent focus:outline-none"
+                disabled={isLoading}
+              />
 
-            <button
-              onClick={() => handleSendMessage()}
-              disabled={isLoading || inputMessage.trim() === ''}
-              className={`w-8 h-10 p-1 rounded-md	 flex items-center justify-center ${
-                isLoading || inputMessage.trim() === ''
-                  ? 'bg-gray-300 cursor-not-allowed'
-                  : 'bg-[#DF6951] hover:bg-[#C55A42] text-white'
-              }`}
-              aria-label="Send"
-            >
-              <FaPaperPlane className="text-sm" /> 
-            </button>
-          </div>
-        </div>
+              {/* Mic Button */}
+              <button
+                onClick={() => handleVoiceStart()}
+                className={`transition-all duration-200 ${
+                  listening ? 'text-red-600 animate-pulse' : 'text-gray-500 hover:text-[#DF6951]'
+                }`}
+                aria-label="Tap to speak"
+              >
+                <FaMicrophone size={17} />
+              </button>
+
+              {/* Send Button */}
+              <button
+                onClick={() => handleSendMessage()}
+                disabled={isLoading || inputMessage.trim() === ''}
+                className={`transition-all duration-200 ${
+                  isLoading || inputMessage.trim() === ''
+                    ? 'text-gray-300 cursor-not-allowed'
+                    : 'text-[#DF6951] hover:text-[#C55A42]'
+                }`}
+                aria-label="Send"
+              >
+                <FaTelegramPlane 
+                  size={20} 
+                  className={selectedLanguage === 'ar-EG' ? 'scale-x-[-1]' : ''}
+                />
+              </button>
+            </div>
+          </div> 
+        </div> 
       )}
-    </div>
-
+    </div> 
   );
 };
+
 
 export default Chatbot;
