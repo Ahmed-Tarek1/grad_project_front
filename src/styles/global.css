@@ -9,3 +9,37 @@
   .font-volkhov {
     font-family: 'Volkhov', serif;
   }
+  
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #e2e8f0;
+  border-radius: 8px;
+}
+
+.dot-flashing {
+  width: 6px;
+  height: 6px;
+  background-color: #666;
+  border-radius: 100%;
+  animation: dotFlashing 1s infinite linear alternate;
+}
+
+.dot-flashing.delay-200 {
+  animation-delay: 0.2s;
+}
+.dot-flashing.delay-400 {
+  animation-delay: 0.4s;
+}
+
+@keyframes dotFlashing {
+  0% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
