@@ -62,7 +62,14 @@ const Navbar = () => {
             <NavLink to="/about" active={location.pathname === "/about"}>
               {t('navbar.about')}
             </NavLink>
-
+<Link
+      to="/my-bookings"
+      className={`flex items-center text-sm font-medium ${
+        location.pathname === "/my-bookings" ? 'text-orange-500' : 'text-gray-700 hover:text-orange-500'
+      }`}
+    >
+      {t('navbar.myBookings')} 
+    </Link>
             <NavLink to="/GetInTouch" active={location.pathname === "/GetInTouch"}>
               {t('navbar.getInTouch')}
             </NavLink>

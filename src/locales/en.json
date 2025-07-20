@@ -7,10 +7,12 @@
     "companies": "Companies",
     "events": "Events",
     "getInTouch": "Get In Touch",
+    "myBookings": "My Bookings",
     "favorites": "Favorites",
     "signUp": "Sign Up",
     "logout": "Logout"
   },
+  
   "footer": {
     "travel": "Travel",
     "travelDescription": "Travel helps companies manage payments easily.",
@@ -28,6 +30,9 @@
     "phone": "Phone",
     "copyright": "Travel Website | All Rights Reserved",
     "footerImageAlt": "Footer Decoration"
+  },
+  "home": {
+    "heroTitle": "No matter where you're going to, we'll take you there"
   },
   "getInTouch": {
     "title": "Get In Touch",

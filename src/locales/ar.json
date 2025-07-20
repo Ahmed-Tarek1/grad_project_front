@@ -9,7 +9,11 @@
     "getInTouch": "اتصل بنا",
     "favorites": "المفضلة",
     "signUp": "تسجيل",
+    "myBookings": "حجوزاتي",
     "logout": "تسجيل خروج"
+  },
+  "home": {
+    "heroTitle": "بغض النظر عن وجهتك، سنوصلك إلى هناك"
   },
   "footer": {
     "travel": "ترافل",

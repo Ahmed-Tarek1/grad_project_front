@@ -86,7 +86,7 @@ const UserBookingsPage = () => {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">My Bookings</h1>
+      <h1 className="font-yesteryear text-5xl text-[#DF6951] mb-2">My Bookings</h1>
       <div className="space-y-6">
         {bookings.map((booking) => (
           <div

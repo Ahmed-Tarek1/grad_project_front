@@ -1,15 +1,41 @@
-import { useState } from 'react';
-import { Search } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
+import { useState } from "react";
+import { Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 const Hero = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchType, setSearchType] = useState('Travels'); // Default search type
+  const { t } = useTranslation(); 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchType, setSearchType] = useState("Travels");
   const navigate = useNavigate();
 
-  const handleSearch = () => {
-    // Implement search logic here based on searchTerm and searchType
-    console.log('Searching for:', searchTerm, 'in', searchType);
+  const handleSearch = async () => {
+    if (!searchTerm.trim()) return;
+
+    try {
+      const response = await fetch(
+        `https://journeymate.runasp.net/api/Search?type=${encodeURIComponent(
+          searchType
+        )}&search=${encodeURIComponent(searchTerm)}&pageSize=5&pageIndex=1`
+      );
+
+      if (!response.ok) {
+        throw new Error("Search request failed");
+      }
+
+      const data = await response.json();
+
+      console.log("Raw API response:", data);
+
+      // Defensive check for items array
+      const results = Array.isArray(data.items) ? data.items : [];
+
+      navigate("/search-results", {
+        state: { results, searchTerm, searchType },
+      });
+    } catch (error) {
+      console.error("Error fetching search results:", error);
+    }
   };
 
   return (
@@ -26,9 +52,9 @@ const Hero = () => {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20">
         <div className="max-w-xl">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            No matter where you're going to, we'll take you there
-          </h1>
+           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+      {t('home.heroTitle')}
+    </h1>
 
           {/* Search Bar with Dropdown */}
           <div className="flex items-center bg-white rounded-md shadow-md">
@@ -60,18 +86,31 @@ const Hero = () => {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div className="flex items-center justify-between space-x-8 overflow-x-auto py-4">
-          <CategoryButton 
-          icon="🏖️" 
-          label="Beaches" 
-          onClick={() => navigate('/beaches')}  />
-          <CategoryButton 
-            icon="🏛️" 
-            label="Heritage" 
-            onClick={() => navigate('/heritage')} 
+          <CategoryButton
+            icon="🏖️"
+            label="Beaches"
+            onClick={() => navigate("/beaches")}
           />
-          <CategoryButton icon="🏔️" label="Mountains" onClick={() => navigate('/mountains')}  />
-          <CategoryButton icon="🌆" label="Cities"  onClick={() => navigate('/cities')}/>
-          <CategoryButton icon="🏺" label="Museums" onClick={()=> navigate('/museums')} />
+          <CategoryButton
+            icon="🏛️"
+            label="Heritage"
+            onClick={() => navigate("/heritage")}
+          />
+          <CategoryButton
+            icon="🏔️"
+            label="Mountains"
+            onClick={() => navigate("/mountains")}
+          />
+          <CategoryButton
+            icon="🌆"
+            label="Cities"
+            onClick={() => navigate("/cities")}
+          />
+          <CategoryButton
+            icon="🏺"
+            label="Museums"
+            onClick={() => navigate("/museums")}
+          />
         </div>
       </div>
     </div>
@@ -85,7 +124,7 @@ interface CategoryButtonProps {
 }
 
 const CategoryButton = ({ icon, label, onClick }: CategoryButtonProps) => (
-  <button 
+  <button
     onClick={onClick}
     className="flex flex-col items-center space-y-2 text-white hover:text-orange-500 transition-colors"
   >

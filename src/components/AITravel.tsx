@@ -224,7 +224,7 @@ const AITravel = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-12">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">AI-Suggested Events for You</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">AI-Suggested Travel for You</h2>
             <p className="text-gray-600">Personalized experiences based on your interests</p>
           </div>
           <div className="hidden md:block">

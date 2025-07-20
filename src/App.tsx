@@ -10,7 +10,7 @@ import SignUp from "./pages/SignUp";
 import './styles/global.css';
 import LogIn from './pages/LogIn';
 import Account from './pages/account';
-
+import SearchResults from "./pages/SearchResults";
 import ContactUsForm from './pages/ContactUsForm';
 import GetInTouch from './pages/GetInTouch';
 import CompaniesPage from './pages/CompaniesPage';
@@ -25,7 +25,7 @@ import EventDetails from './pages/EventDetails';
 import { setupWeeklySubmission } from './services/schedulerService';
 import { UserProvider } from './context/UserContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import { authService } from './services/authService';
+// import { authService } from './services/authService';
 import ResetPassword from './pages/ResetPassword';
 import AllTours from './components/AllTours';
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -48,6 +48,7 @@ import { extractUserIdFromToken } from './services/authService';
 
 import NewBookingPage from "./pages/NewBookingPage";
 import UserBookingsPage from "./pages/UserBookingsPage";
+
 import PaymentPage from "./pages/PaymentPage";
 import PaymentStatus from "./pages/PaymentStatus";
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -97,7 +98,7 @@ function App() {
                     <Route path="/GetInTouch" element={<GetInTouch />} />
                     <Route path="/companies/:companyId" element={<CompaniesPage />} />
                     <Route path="/partners" element={<Partners />} />
-                    
+                    <Route path="/search-results" element={<SearchResults />} />
                     <Route path="/companies" element={<Companies />} />
                     <Route path="/events" element={<Events />} />
                     <Route path="/events/:id" element={<EventDetails />} />
@@ -126,6 +127,7 @@ function App() {
                   
                     <Route path="/payment" element={<PaymentPage />} />
                     <Route path="/payment-status" element={<PaymentStatus />} />
+                    
                     <Route path="/book-now" element={<NewBookingPage />} />
                     <Route path="/my-bookings" element={<UserBookingsPage />} />
 
