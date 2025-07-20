@@ -1,9 +1,11 @@
-import { useContext, useState, useEffect } from 'react';
-import { FaPaperPlane } from 'react-icons/fa';
+import { useContext, useState, useEffect, useRef } from 'react';
+import { FaMicrophone, FaTelegramPlane } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { ChatbotContext } from '../context/ChatbotContext';
 import kemetImage from '../assets/images/weeeeeeeeeee.jpg';
 import * as signalR from '@microsoft/signalr';
+import { useTranslation } from 'react-i18next';
+
 
 interface Travel {
   id: number;
@@ -47,6 +49,104 @@ const Chatbot = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
+  const [inputMode, setInputMode] = useState<'voice' | 'text'>('voice');
+  const inputModeRef = useRef<'voice' | 'text'>('voice');
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const retryLangRef = useRef<string | null>(null);
+  const hasRetriedRef = useRef(false);
+  const [listening, setListening] = useState(false);
+  const { i18n } = useTranslation();
+
+  const selectedLanguage = i18n.language === 'ar' ? 'ar-EG' : 'en-US';
+  
+  function handleVoiceStart(forcedLang?: 'ar-EG' | 'en-US') {
+    const recognitionLang = forcedLang || selectedLanguage;
+    setInputMode('voice');
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Your browser does not support Speech Recognition.");
+      return;
+    }
+    if (recognitionRef.current) {
+      recognitionRef.current.abort();
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = recognitionLang;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognitionRef.current = recognition;
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript.trim();
+      const isArabic = /[\u0600-\u06FF]/.test(transcript);
+      if (!hasRetriedRef.current && (
+          (recognitionLang === 'ar-EG' && !isArabic) ||
+          (recognitionLang === 'en-US' && isArabic)
+      )) {
+        hasRetriedRef.current = true;
+        retryLangRef.current = recognitionLang === 'ar-EG' ? 'en-US' : 'ar-EG';
+        recognition.stop();
+      } else {
+        hasRetriedRef.current = false;
+        handleSendMessage(transcript);
+      }
+    };
+    recognition.onerror = (event) => {
+      alert("Speech Recognition Error: " + event.error);
+    };
+    recognition.onend = () => {
+      setListening(false);
+      if (retryLangRef.current) {
+        const retryLang = retryLangRef.current;
+        retryLangRef.current = null;
+        // This message is shown before switching to the new language
+        setMessages(prev => [
+          ...prev,
+          {
+            text: retryLang === 'ar-EG'
+              ? "لم أتمكن من فهم ذلك. سأحاول بالعربية."
+              : "Couldn't understand. Retrying in English.",
+            sender: 'bot',
+            timestamp: new Date()
+          }
+        ]);
+        handleVoiceStart(retryLang); // Retry with the opposite language
+      }
+    };
+    recognition.start();
+    setListening(true);
+  }
+
+  function speak(text: string) {
+    if (!window.speechSynthesis) return;
+    const utterance = new SpeechSynthesisUtterance(text);
+    const containsArabic = /[\u0600-\u06FF]/.test(text); // Arabic character detection
+    utterance.lang = containsArabic ? 'ar-EG' : 'en-US';
+    const setVoiceAndSpeak = () => {
+      const voices = window.speechSynthesis.getVoices();
+      const arabicVoice = voices.find(v => v.lang.startsWith('ar'));
+      const englishVoice = voices.find(v => v.name === "Aaron");
+      if (containsArabic && arabicVoice) {
+        utterance.voice = arabicVoice;
+      } else if (!containsArabic && englishVoice) {
+        utterance.voice = englishVoice;
+      } else {
+        utterance.voice = voices[0]; // fallback to first available
+      }
+      utterance.pitch = containsArabic ? 1.2 : 1.0;
+      utterance.rate = containsArabic ? 1.3 : 0.88;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+    };
+    if (window.speechSynthesis.getVoices().length === 0) {
+      window.speechSynthesis.onvoiceschanged = setVoiceAndSpeak;
+    } else {
+      setVoiceAndSpeak();
+    }
+  }
+
+  useEffect(() => {
+    inputModeRef.current = inputMode;
+  }, [inputMode]);
 
   useEffect(() => {
     const connectionOptions: signalR.IHttpConnectionOptions = {
@@ -90,7 +190,11 @@ const Chatbot = () => {
                   date: event.date ? new Date(event.date) : new Date()
                 })) : undefined
               };
-              
+	
+              if (inputModeRef.current === 'voice') {
+                speak(serverResponse.response);
+              }
+
               setMessages(previousMessages => [...previousMessages, botMessage]);
             } catch (error) {
               console.error('Error processing server response:', error);
@@ -117,22 +221,35 @@ const Chatbot = () => {
 
   useEffect(() => {
     if (isChatOpen && messages.length === 0) {
+      const welcomeText =
+        selectedLanguage === 'ar-EG'
+          ? 'مرحبًا، أنا كيميت. أنا هنا لمساعدتك في استكشاف مصر. كيف يمكنني مساعدتك؟'
+          : "Hello, I am Kemet. I'm here to help you explore Egypt. How may I assist you today?";
+
       const welcomeMessage: ChatMessage = {
-        text: "Hello, I am Kemet. I'm here to help you explore Egypt. How may I assist you today?",
+        text: welcomeText,
         sender: 'bot',
         timestamp: new Date()
       };
       setMessages([welcomeMessage]);
     }
-  }, [isChatOpen, messages.length, setMessages]);
+  }, [isChatOpen, messages.length, setMessages, selectedLanguage]);
 
-  const handleSendMessage = async () => {
+	
+  const handleSendMessage = async (messageToSend?: string) => {
+    const message = messageToSend?.trim() || inputMessage.trim();
     if (inputMessage.trim() === '' || !connection) {
+    if (message === '' || !connection) {
       return;
+    }
+    }
+    if (!messageToSend) {
+      setInputMode('text');
+    
     }
     
     const userMessage: ChatMessage = {
-      text: inputMessage,
+      text: message,
       sender: 'user',
       timestamp: new Date()
     };
@@ -142,7 +259,7 @@ const Chatbot = () => {
     setIsLoading(true);
 
     try {
-      await connection.invoke("SendMessage", inputMessage);
+      await connection.invoke("SendMessage", message);
     } catch (error) {
       console.error("Error sending message:", error);
       const errorMessage: ChatMessage = {
@@ -176,24 +293,26 @@ const Chatbot = () => {
 };
 
   return (
-    <div className="fixed bottom-8 right-8 z-[9999]">
-      <button
-        onClick={toggleChat}
-        className={`w-20 h-20 rounded-full bg-[#DF6951] text-white flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 ${
-          !isChatOpen ? 'animate-float' : ''
-        }`}
-        aria-label="Toggle chatbot"
-      >
-        <img 
-          src={kemetImage} 
-          alt="Kemet Assistant" 
-          className="w-16 h-16 rounded-full object-cover"
-        />
-      </button>
+    <div className="fixed bottom-5 right-5 z-[9999]">
+      {!isChatOpen && (
+        <button
+          onClick={toggleChat}
+          className={`w-18 h-18 rounded-full bg-[#DF6951] text-white flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 ${
+            !isChatOpen ? 'animate-float' : ''
+          }`}
+          aria-label="Toggle chatbot"
+        >
+          <img 
+            src={kemetImage} 
+            alt="Kemet Assistant" 
+            className="w-16 h-16 rounded-full object-cover"
+          />
+        </button>
+      )}
 
       {isChatOpen && (
         <div 
-          className="w-[350px] h-[500px] bg-white rounded-t-lg rounded-bl-lg shadow-xl flex flex-col absolute bottom-20 right-0 overflow-hidden"
+          className="w-[375px] h-[540px] bg-white rounded-t-lg rounded-bl-lg shadow-xl flex flex-col absolute bottom-5 right-0 overflow-hidden"
           style={{ 
             clipPath: 'polygon(0 0, 100% 0, 100% 100%, 20px 100%, 0 calc(100% - 20px))',
             boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
@@ -325,28 +444,51 @@ const Chatbot = () => {
             )}
           </div>
 
-          <div className="border-t border-gray-200 p-3 bg-white flex items-center">
-            <input
-              type="text"
-              value={inputMessage}
-              onChange={(event) => setInputMessage(event.target.value)}
-              onKeyPress={(event) => event.key === 'Enter' && handleSendMessage()}
-              placeholder="Ask about Egypt..."
-              className="flex-1 border border-gray-300 rounded-l-lg px-4 h-12 focus:outline-none focus:ring-1 focus:ring-[#DF6951] focus:border-[#DF6951] transition-colors duration-200"
-              disabled={isLoading}
-            />
-            <button
-              onClick={handleSendMessage}
-              disabled={isLoading || inputMessage.trim() === ''}
-              className={`h-12 px-4 rounded-r-lg transition-colors duration-200 w-16 flex items-center justify-center ${
-                isLoading || inputMessage.trim() === ''
-                  ? 'bg-gray-300 cursor-not-allowed'
-                  : 'bg-[#DF6951] hover:bg-[#C55A42] text-white'
-              }`}
-              aria-label="Send message"
+          <div className="border-t border-gray-200 p-3 bg-white">
+            <div
+              className={`flex items-center gap-2 border border-gray-300 rounded-xl px-4 py-3.5 bg-white transition-all duration-200`}
             >
-              <FaPaperPlane className={`transition-opacity ${isLoading ? 'opacity-50' : ''}`} />
-            </button>
+              {/* Text Input */}
+              <input
+                type="text"
+                value={inputMessage}
+                onChange={(event) => setInputMessage(event.target.value)}
+                onKeyDown={(event) => event.key === 'Enter' && handleSendMessage()}
+                placeholder={selectedLanguage === 'ar-EG' ? "اسأل عن مصر ..." : "Ask about Egypt ..."}
+                dir={selectedLanguage === 'ar-EG' ? 'rtl' : 'ltr'}
+                className="flex-1 text-sm bg-transparent focus:outline-none"
+                disabled={isLoading}
+              />
+
+              {/* Mic Button */}
+              <button
+                onClick={() => handleVoiceStart()}
+                className={`transition-all duration-200 ${
+                  listening ? 'text-red-600 animate-pulse' : 'text-gray-500 hover:text-[#DF6951]'
+                }`}
+                aria-label="Tap to speak"
+              >
+                <FaMicrophone size={17} />
+              </button>
+
+              {/* Send Button */}
+              <button
+                onClick={() => handleSendMessage()}
+                disabled={isLoading || inputMessage.trim() === ''}
+                className={`transition-all duration-200 ${
+                  isLoading || inputMessage.trim() === ''
+                    ? 'text-gray-300 cursor-not-allowed'
+                    : 'text-[#DF6951] hover:text-[#C55A42]'
+                }`}
+                aria-label="Send message"
+              >
+                <FaTelegramPlane 
+                  size={20}
+                  className={`${selectedLanguage === 'ar-EG' ? 'scale-x-[-1]' : ''} transition-opacity ${isLoading ? 'opacity-50' : ''}`}
+
+                />            
+              </button>
+            </div>
           </div>
         </div>
       )}
